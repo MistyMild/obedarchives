@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Obedience-Archives Checklist</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4361ee;
+            --primary-dark: #3a56d4;
+            --secondary: #7209b7;
+            --light-bg: #f8f9fa;
+            --border: #e9ecef;
+            --text: #212529;
+            --text-secondary: #6c757d;
+            --success: #2ec4b6;
+            --success-light: #e8f8f5;
+            --danger: #e63946;
+            --warning: #f9c74f;
+            --info: #4cc9f0;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--light-bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px 15px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-icon {
+            color: var(--primary);
+        }
+
+        .checklist-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .checklist-header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px 30px;
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sections-container {
+            padding: 20px 30px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .section-icon {
+            margin-right: 10px;
+            width: 22px;
+            text-align: center;
+        }
+
+        .task-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .task-item {
+            padding: 15px;
+            background-color: var(--light-bg);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+
+        .task-item:hover {
+            background-color: rgba(67, 97, 238, 0.05);
+        }
+
+        .task-checkbox {
+            appearance: none;
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--primary);
+            border-radius: 4px;
+            margin-right: 12px;
+            cursor: pointer;
+            position: relative;
+            transition: all 0.2s ease;
+        }
+
+        .task-checkbox:checked {
+            background-color: var(--primary);
+        }
+
+        .task-checkbox:checked::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+        }
+
+        .task-number {
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-right: 8px;
+            min-width: 20px;
+        }
+
+        .task-content {
+            flex: 1;
+            font-size: 15px;
+            color: var(--text);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .admin-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+            margin-top: 20px;
+            margin-left: auto;
+        }
+
+        .admin-btn:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 450px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            animation: modalFadeIn 0.3s;
+        }
+
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 24px;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: var(--text);
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            font-size: 15px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            transition: border-color 0.2s;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.2);
+        }
+
+        .form-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .btn {
+            padding: 10px 16px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
+        .btn-secondary {
+            background-color: var(--light-bg);
+            color: var(--text);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--border);
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #d32f2f;
+        }
+
+        .admin-panel {
+            display: none;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .admin-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .admin-panel-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text);
+            margin: 0;
+        }
+
+        .admin-panel-body {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .admin-panel-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .sync-indicator {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--success);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-100px);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .sync-indicator.show {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 900px) {
+            .task-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .admin-panel-body {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .task-grid {
+                grid-template-columns: 1fr;
+            }
+            .sections-container {
+                padding: 15px;
+            }
+            .checklist-header {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-check-square logo-icon"></i>
+                <span>Obedience-Archives</span>
+            </div>
+        </div>
+
+        <div class="checklist-container">
+            <div class="checklist-header">
+                <div>TODO LIST FOR THE WEEK</div>
+            </div>
+
+            <div class="sections-container" id="sectionsContainer">
+                <!-- Content will be dynamically generated -->
+            </div>
+        </div>
+
+        <button id="adminLoginBtn" class="admin-btn">
+            <i class="fas fa-lock"></i> Admin Access
+        </button>
+
+        <!-- Admin Login Modal -->
+        <div id="adminLoginModal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3 class="modal-title">Admin Login</h3>
+                    <button class="modal-close" id="closeModal">&times;</button>
+                </div>
+                <div class="form-group">
+                    <label for="adminPassword" class="form-label">Password</label>
+                    <input type="password" id="adminPassword" class="form-control" placeholder="Enter admin password">
+                    <div class="form-hint">Hint: password is "admin123"</div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-secondary" id="cancelLoginBtn">Cancel</button>
+                    <button class="btn btn-primary" id="loginButton">Login</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="adminPanel" class="admin-panel">
+            <div class="admin-panel-header">
+                <h3 class="admin-panel-title">Admin Control Panel</h3>
+            </div>
+            <div class="admin-panel-body">
+                <div class="form-group">
+                    <label for="categorySelect" class="form-label">Select Category</label>
+                    <select id="categorySelect" class="form-control"></select>
+                </div>
+                <div class="form-group">
+                    <label for="taskIndex" class="form-label">Task Number</label>
+                    <select id="taskIndex" class="form-control">
+                        <option value="0">Task 1</option>
+                        <option value="1">Task 2</option>
+                        <option value="2">Task 3</option>
+                        <option value="3">Task 4</option>
+                    </select>
+                </div>
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label for="taskText" class="form-label">Task Description</label>
+                    <input type="text" id="taskText" class="form-control" placeholder="Enter task description">
+                </div>
+            </div>
+            <div class="admin-panel-actions">
+                <button id="updateTaskBtn" class="btn btn-primary">Update Task</button>
+                <button id="clearTaskBtn" class="btn btn-secondary">Clear Task</button>
+                <button id="resetAllBtn" class="btn btn-danger">Reset All Tasks</button>
+                <button id="logoutBtn" class="btn btn-secondary">Logout</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="syncIndicator" class="sync-indicator">
+        <i class="fas fa-sync-alt"></i>
+        <span id="syncMessage">Changes saved successfully</span>
+    </div>
+
+    <script>
+        // Constants
+        const ADMIN_PASSWORD = "admin123";
+        const STORAGE_KEY = "obedienceArchivesTodo";
+        
+        // Category definitions with icons
+        const categories = [
+            { name: "MATH", icon: "fas fa-square-root-alt" },
+            { name: "SCIENCE", icon: "fas fa-flask" },
+            { name: "AP", icon: "fas fa-landmark" },
+            { name: "ENGLISH", icon: "fas fa-book" },
+            { name: "FILIPINO", icon: "fas fa-flag" },
+            { name: "ICT", icon: "fas fa-laptop-code" },
+            { name: "ENVISCI", icon: "fas fa-leaf" },
+            { name: "RESEARCH", icon: "fas fa-search" },
+            { name: "MAPEH", icon: "fas fa-music" },
+            { name: "UPCOMING QUIZZES", icon: "fas fa-clipboard-list" },
+            { name: "UPCOMING EVENTS", icon: "fas fa-calendar-alt" },
+            { name: "UPCOMING EXAMS", icon: "fas fa-graduation-cap" }
+        ];
+        
+        // DOM Elements
+        const sectionsContainerEl = document.getElementById("sectionsContainer");
+        const adminLoginBtn = document.getElementById("adminLoginBtn");
+        const adminLoginModal = document.getElementById("adminLoginModal");
+        const closeModalBtn = document.getElementById("closeModal");
+        const cancelLoginBtn = document.getElementById("cancelLoginBtn");
+        const adminPasswordEl = document.getElementById("adminPassword");
+        const loginButton = document.getElementById("loginButton");
+        const adminPanelEl = document.getElementById("adminPanel");
+        const categorySelectEl = document.getElementById("categorySelect");
+        const taskIndexEl = document.getElementById("taskIndex");
+        const taskTextEl = document.getElementById("taskText");
+        const updateTaskBtn = document.getElementById("updateTaskBtn");
+        const clearTaskBtn = document.getElementById("clearTaskBtn");
+        const resetAllBtn = document.getElementById("resetAllBtn");
+        const logoutBtn = document.getElementById("logoutBtn");
+        const syncIndicatorEl = document.getElementById("syncIndicator");
+        const syncMessageEl = document.getElementById("syncMessage");
+        
+        // State
+        let todoData = {};
+        let isAdmin = false;
+        
+        // Helper Functions
+        function showSyncStatus(message) {
+            syncMessageEl.textContent = message;
+            syncIndicatorEl.classList.add("show");
+            setTimeout(() => {
+                syncIndicatorEl.classList.remove("show");
+            }, 3000);
+        }
+        
+        function initializeData() {
+            categories.forEach(category => {
+                todoData[category.name] = Array(4).fill("");
+            });
+        }
+        
+        function saveTodoData() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(todoData));
+            showSyncStatus("Changes saved successfully");
+        }
+        
+        function loadTodoData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                todoData = JSON.parse(stored);
+                
+                // Ensure all categories exist (in case new ones were added)
+                categories.forEach(category => {
+                    if (!todoData[category.name]) {
+                        todoData[category.name] = Array(4).fill("");
+                    }
+                });
+            } else {
+                initializeData();
+                saveTodoData();
+            }
+        }
+        
+        function renderTodoList() {
+            sectionsContainerEl.innerHTML = "";
+            
+            // Group categories into 4 sections of 3 each
+            for (let i = 0; i < categories.length; i += 3) {
+                const sectionCategories = categories.slice(i, i + 3);
+                
+                const section = document.createElement("div");
+                section.className = "section";
+                
+                const taskGrid = document.createElement("div");
+                taskGrid.className = "task-grid";
+                
+                sectionCategories.forEach(category => {
+                    // Create category column
+                    const categoryColumn = document.createElement("div");
+                    categoryColumn.className = "category-column";
+                    
+                    // Create header
+                    const sectionHeader = document.createElement("div");
+                    sectionHeader.className = "section-header";
+                    
+                    const iconSpan = document.createElement("span");
+                    iconSpan.className = "section-icon";
+                    const icon = document.createElement("i");
+                    icon.className = category.icon;
+                    iconSpan.appendChild(icon);
+                    
+                    const titleSpan = document.createElement("span");
+                    titleSpan.textContent = category.name;
+                    
+                    sectionHeader.appendChild(iconSpan);
+                    sectionHeader.appendChild(titleSpan);
+                    categoryColumn.appendChild(sectionHeader);
+                    
+                    // Create tasks
+                    for (let j = 0; j < 4; j++) {
+                        const taskItem = document.createElement("div");
+                        taskItem.className = "task-item";
+                        
+                        const taskCheckbox = document.createElement("input");
+                        taskCheckbox.type = "checkbox";
+                        taskCheckbox.className = "task-checkbox";
+                        taskCheckbox.dataset.category = category.name;
+                        taskCheckbox.dataset.index = j;
+                        
+                        const taskNumber = document.createElement("span");
+                        taskNumber.className = "task-number";
+                        taskNumber.textContent = `${j + 1}.`;
+                        
+                        const taskContent = document.createElement("span");
+                        taskContent.className = "task-content";
+                        taskContent.textContent = todoData[category.name][j] || "";
+                        
+                        taskItem.appendChild(taskCheckbox);
+                        taskItem.appendChild(taskNumber);
+                        taskItem.appendChild(taskContent);
+                        categoryColumn.appendChild(taskItem);
+                    }
+                    
+                    taskGrid.appendChild(categoryColumn);
+                });
+                
+                section.appendChild(taskGrid);
+                sectionsContainerEl.appendChild(section);
+            }
+            
+            // Add event listeners to checkboxes
+            document.querySelectorAll(".task-checkbox").forEach(checkbox => {
+                checkbox.addEventListener("change", handleCheckboxChange);
+            });
+        }
+        
+        function handleCheckboxChange(e) {
+            // In a real application, you might want to save the checkbox state
+            // For this demo, we'll just allow checking/unchecking without saving the state
+        }
+        
+        function populateCategorySelect() {
+            categorySelectEl.innerHTML = "";
+            categories.forEach(category => {
+                const option = document.createElement("option");
+                option.value = category.name;
+                option.textContent = category.name;
+                categorySelectEl.appendChild(option);
+            });
+        }
+        
+        function updateTask() {
+            const category = categorySelectEl.value;
+            const index = parseInt(taskIndexEl.value);
+            const text = taskTextEl.value.trim();
+            
+            todoData[category][index] = text;
+            saveTodoData();
+            renderTodoList();
+            
+            taskTextEl.value = "";
+            showSyncStatus("Task updated successfully");
+        }
+        
+        function clearTask() {
+            const category = categorySelectEl.value;
+            const index = parseInt(taskIndexEl.value);
+            
+            todoData[category][index] = "";
+            saveTodoData();
+            renderTodoList();
+            showSyncStatus("Task cleared successfully");
+        }
+        
+        function resetAllTasks() {
+            if (confirm("Are you sure you want to reset all tasks? This cannot be undone.")) {
+                initializeData();
+                saveTodoData();
+                renderTodoList();
+                showSyncStatus("All tasks have been reset");
+            }
+        }
+        
+        function showAdminPanel() {
+            adminPanelEl.style.display = "block";
+            adminLoginModal.style.display = "none";
+            adminPasswordEl.value = "";
+        }
+        
+        function hideAdminPanel() {
+            adminPanelEl.style.display = "none";
+            isAdmin = false;
+        }
+        
+        function openLoginModal() {
+            adminLoginModal.style.display = "block";
+            adminPasswordEl.focus();
+        }
+        
+        function closeLoginModal() {
+            adminLoginModal.style.display = "none";
+            adminPasswordEl.value = "";
+        }
+        
+        function attemptLogin() {
+            const password = adminPasswordEl.value;
+            if (password === ADMIN_PASSWORD) {
+                isAdmin = true;
+                showAdminPanel();
+                showSyncStatus("Admin login successful");
+            } else {
+                alert("Incorrect password");
+            }
+        }
+        
+        // Setup polling for changes (checks every 10 seconds)
+        function setupPolling() {
+            setInterval(() => {
+                const stored = localStorage.getItem(STORAGE_KEY);
+                if (stored) {
+                    const storedData = JSON.parse(stored);
+                    const currentDataJSON = JSON.stringify(todoData);
+                    const storedDataJSON = JSON.stringify(storedData);
+                    
+                    if (currentDataJSON !== storedDataJSON) {
+                        todoData = storedData;
+                        renderTodoList();
+                        showSyncStatus("List updated with new changes");
+                    }
+                }
+            }, 10000);
+        }
+        
+        // Event Listeners
+        adminLoginBtn.addEventListener("click", openLoginModal);
+        closeModalBtn.addEventListener("click", closeLoginModal);
+        cancelLoginBtn.addEventListener("click", closeLoginModal);
+        loginButton.addEventListener("click", attemptLogin);
+        updateTaskBtn.addEventListener("click", updateTask);
+        clearTaskBtn.addEventListener("click", clearTask);
+        resetAllBtn.addEventListener("click", resetAllTasks);
+        logoutBtn.addEventListener("click", hideAdminPanel);
+        
+        adminPasswordEl.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") attemptLogin();
+        });
+        
+        taskTextEl.addEventListener("keypress", (e) => {
+            if (e.key === "Enter") updateTask();
+        });
+        
+        // Window click to close modal
+        window.addEventListener("click", (e) => {
+            if (e.target === adminLoginModal) {
+                closeLoginModal();
+            }
+        });
+        
+        // Initialize
+        document.addEventListener("DOMContentLoaded", () => {
+            loadTodoData();
+            renderTodoList();
+            populateCategorySelect();
+            setupPolling();
+        });
+    </script>
+</body>
+</html>
